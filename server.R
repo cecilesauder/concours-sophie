@@ -95,11 +95,6 @@ shinyServer(function(input, output) {
 
   })
   
-  output$frame <- renderUI({
-    
-    tags$iframe(src = vote_for_lexie_html(),
-                height = 800, width = 1400)
-  })
   
   
 })

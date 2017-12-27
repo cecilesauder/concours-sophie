@@ -26,12 +26,7 @@ dashboardPage(
         ggiraphOutput("plot")
         
       )
-    ),
-    fluidRow(
-      uiOutput("frame")
-
     )
-
 
   )
 )
