@@ -1,0 +1,15 @@
+a.button {
+display:block;
+width:150px;
+line-height:50px;
+text-align:center;
+vertical-align:middle;
+background:url(boutonnoir.png) no-repeat;
+color:white;
+text-decoration: none;
+font-weight:bold;
+font-size:18;
+}
+a:hover.button {
+background:url(boutonnoir2.png) no-repeat;
+}

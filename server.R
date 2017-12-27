@@ -38,7 +38,7 @@ shinyServer(function(input, output) {
     df$col[id == id_lexie] <- "red"
     df$col <- as.factor(df$col)
     
-    invalidateLater(6000)
+    invalidateLater(8000)
     
     df
   })
@@ -81,7 +81,7 @@ shinyServer(function(input, output) {
       theme_light() +
 #      theme(axis.text.y = element_text(face="bold", size = 12, color = myPalette[df$col])) +
       scale_fill_manual(values=c('#999999','#FF00FF')) +
-      xlab("bébé") +
+      xlab("bébés") +
       ggtitle("Les 10 premiers du concours sont pré-selectionnés") +
       geom_bar_interactive(aes(tooltip = votes, data_id = nameKid),stat="identity") +
       guides(fill = FALSE) +
@@ -93,7 +93,7 @@ shinyServer(function(input, output) {
 
     ggiraph(code = print(gg), hover_css = "fill-opacity:.6;cursor:pointer;",
             width = 0.8, width_svg = 6,
-            height_svg = 3, selection_type = "none")
+            height_svg = 4, selection_type = "none")
 
   })
   
