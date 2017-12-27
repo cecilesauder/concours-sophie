@@ -75,12 +75,14 @@ shinyServer(function(input, output) {
       votes = df %>% filter(nameKid == "Lexie") %>% pull(votes) %>% add(100),
       col = "black" )
     
-    gg <- df %>%
+    gg <- df %>% 
+      filter(classement < 21) %>%
       ggplot(aes(x = numKid, y = votes , fill = col)) + 
       theme_light() +
 #      theme(axis.text.y = element_text(face="bold", size = 12, color = myPalette[df$col])) +
       scale_fill_manual(values=c('#999999','#FF00FF')) +
-      xlab("Kids") +
+      xlab("bébé") +
+      ggtitle("Les 10 premiers du concours sont pré-selectionnés") +
       geom_bar_interactive(aes(tooltip = votes, data_id = nameKid),stat="identity") +
       guides(fill = FALSE) +
       coord_flip() + 
@@ -91,7 +93,7 @@ shinyServer(function(input, output) {
 
     ggiraph(code = print(gg), hover_css = "fill-opacity:.6;cursor:pointer;",
             width = 0.8, width_svg = 6,
-            height_svg = 5, selection_type = "none")
+            height_svg = 3, selection_type = "none")
 
   })
   
