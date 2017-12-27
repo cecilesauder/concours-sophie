@@ -16,27 +16,23 @@ dashboardPage(
         solidHeader = TRUE,
         width = 4,
         valueBoxOutput("numVotes",  width = 12),
-        valueBoxOutput("numLexie",  width = 12)
+        valueBoxOutput("numLexie",  width = 12),
+        tags$img(src = "téléchargement.gif"),
+        tags$img(src = "sophiehexa.png")
       ),
       box(
         status = "info",
-        width = 4,
+        width = 8,
         ggiraphOutput("plot")
         
-      ),
-      box(
-        width = 3,
-        tags$img(src = "téléchargement.gif"),
-        tags$img(src = "sophiehexa.png")
       )
     ),
     fluidRow(
-      tags$iframe(src = "http://www3.jeuconcours.fr/leplusbeaubebesophielagirafe/photos.php?photo=5a253562179c7357561081&v=2",
-                  height = 800, width = 1400)
+      uiOutput("frame")
+
     )
 
 
-    #uiOutput("Site")
   )
 )
 

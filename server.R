@@ -2,7 +2,7 @@ library(shiny)
 library(tidyverse)
 library(rvest)
 library(ggiraph)
-
+library(magrittr)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -11,15 +11,13 @@ shinyServer(function(input, output) {
     concours <-
       read_html( "http://www3.jeuconcours.fr/leplusbeaubebesophielagirafe/photos.php" )
     
-    vote_for_lexie_html <-"http://www3.jeuconcours.fr/leplusbeaubebesophielagirafe/photos.php?photo=5a253562179c7357561081&v=2"
+    #recupère les identifiants des differentes photos du concours
+    id <- html_nodes(concours, ".enfants100 li a") %>% 
+      html_attr("href") %>%
+      str_replace( ".*/(.*).jpg", "\\1")#remplace par ce que je capture entre les parenthèses qui est \\1
     
-    lexie <- read_html(vote_for_lexie_html)
-    
-    votes_lexie <- 
-      html_nodes(lexie, ".bottom-box-vote span.votes") %>%
-      str_extract( "[[:digit:]]+" ) %>%
-      as.numeric()
-    
+    id_lexie <- "5a253562179c7357561081"
+
     votes <- 
       html_nodes(concours, ".enfants span.votes") %>%
       str_extract( "[[:digit:]]+" ) %>%
@@ -28,19 +26,22 @@ shinyServer(function(input, output) {
     nb_enfants <- length(votes)
     
     df <- 
-      data.frame(votes = votes) %>% 
-      mutate(numKid = paste0("Kid", 1:nb_enfants),
-             col = rep("black", nb_enfants))
-    df <- df %>%
-      mutate(classement = as.numeric(row.names(df)))
+      data.frame(votes = votes, id = id) %>% 
+      mutate(numKid = 1:nb_enfants,
+             nameKid = 1:nb_enfants,
+             col = rep("black", nb_enfants)) %>%
+      rownames_to_column("classement")
     
     
-    df$numKid[votes == votes_lexie] <- "Lexie"
-    df$col[votes == votes_lexie] <- "red"
+    df$nameKid[id == id_lexie] <- "Lexie"
+    df$col[id == id_lexie] <- "red"
     df$col <- as.factor(df$col)
+    
+    invalidateLater(6000)
     
     df
   })
+  
   
   output$numVotes <- renderValueBox({
     df <- df()
@@ -67,19 +68,35 @@ shinyServer(function(input, output) {
     
     myPalette <- c('#999999','#FF00FF')
     names(myPalette) <- levels(df$col)
+    df_text <- data.frame ( 
+      numKid = df %>% filter(nameKid == "Lexie") %>% pull(numKid),
+      votes = df %>% filter(nameKid == "Lexie") %>% pull(votes) %>% add(100),
+      col = "black" )
     
     gg <- df %>%
-      ggplot(aes(x= reorder(numKid, -votes), y=votes , fill = col)) + 
-      theme(axis.text.x = element_text(face="bold", size = 12, color = myPalette[df$col])) +
+      ggplot(aes(x = numKid, y = votes , fill = col)) + 
+      theme_light() +
+#      theme(axis.text.y = element_text(face="bold", size = 12, color = myPalette[df$col])) +
       scale_fill_manual(values=c('#999999','#FF00FF')) +
       xlab("Kids") +
-      geom_bar_interactive(aes(tooltip = votes, data_id = numKid),stat="identity") +
-      guides(fill = FALSE) 
+      geom_bar_interactive(aes(tooltip = votes, data_id = nameKid),stat="identity") +
+      guides(fill = FALSE) +
+      coord_flip() + 
+      scale_x_reverse() +
+      geom_vline(xintercept = 10.5, linetype = 2) +
+      geom_text(data = df_text, mapping = aes(label = "Lexie"))
+      
 
     ggiraph(code = print(gg), hover_css = "fill-opacity:.6;cursor:pointer;",
             width = 0.8, width_svg = 6,
             height_svg = 5, selection_type = "none")
 
+  })
+  
+  output$frame <- renderUI({
+    
+    tags$iframe(src = vote_for_lexie_html(),
+                height = 800, width = 1400)
   })
   
   
