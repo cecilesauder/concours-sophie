@@ -5,6 +5,6 @@ account: cecilesauder
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 244372
-bundleId: 1151672
+bundleId: 1152226
 url: https://cecilesauder.shinyapps.io/concours-sophie/
-when: 1514343403.10024
+when: 1514384198.51771

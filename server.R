@@ -5,9 +5,9 @@ library(ggiraph)
 library(magrittr)
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
-  df <- reactive({
+  download_df <- function(){
     concours <-
       read_html( "http://www3.jeuconcours.fr/leplusbeaubebesophielagirafe/photos.php" )
     
@@ -17,14 +17,14 @@ shinyServer(function(input, output) {
       str_replace( ".*/(.*).jpg", "\\1")#remplace par ce que je capture entre les parenthèses qui est \\1
     
     id_lexie <- "5a253562179c7357561081"
-
+    
     votes <- 
       html_nodes(concours, ".enfants span.votes") %>%
       str_extract( "[[:digit:]]+" ) %>%
       as.numeric()
     
     votes_lexie <- votes[id == id_lexie]
-
+    
     nb_enfants <- length(votes)
     
     df <- 
@@ -42,9 +42,38 @@ shinyServer(function(input, output) {
     df$col[id == id_lexie] <- "red"
     df$col <- as.factor(df$col)
     
-    invalidateLater(8000)
-
     df
+  }
+  
+  df_actuel <- NULL
+  
+  somme_votes <- 0
+  
+  
+  df <- reactivePoll(
+    5000, 
+    session,
+    checkFunc = function(){
+#    showNotification("coucou")
+      if(is.null(df_actuel)){
+        df_actuel <<- download_df()
+        somme_votes <<- sum(df_actuel$votes)
+        return(TRUE)
+      }
+      df_new <- download_df()
+      somme_votes_new <- sum(df_new$votes)
+      
+      if(somme_votes_new == somme_votes){
+        return(FALSE)
+      }else{
+        df_actuel <<- df_new
+        somme_votes <<- somme_votes_new
+        return(TRUE)
+      }
+      
+    },                 
+    valueFunc = function(){
+      df_actuel
   })
   
   
