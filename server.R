@@ -30,7 +30,8 @@ shinyServer(function(input, output) {
       mutate(numKid = 1:nb_enfants,
              nameKid = 1:nb_enfants,
              col = rep("black", nb_enfants)) %>%
-      rownames_to_column("classement")
+      rownames_to_column("classement") %>%
+      mutate(classement = as.numeric(classement))
     
     
     df$nameKid[id == id_lexie] <- "Lexie"
@@ -47,8 +48,8 @@ shinyServer(function(input, output) {
     df <- df()
     votes_lexie <- 
       df %>%
-      filter(numKid == "Lexie") %>%
-      select(votes)
+      filter(nameKid == "Lexie") %>%
+      pull(votes)
     valueBox(votes_lexie, "Votes", color = "maroon", icon = icon("check", lib = "glyphicon"), width = 12)
   })
   
@@ -56,8 +57,9 @@ shinyServer(function(input, output) {
     df <- df()
     classement_lexie <-
       df %>%
-        filter(numKid == "Lexie") %>%
-        select(classement)
+        filter(nameKid == "Lexie") %>%
+        pull(classement)
+    
     valueBox(paste0(classement_lexie, "/", max(df$classement)) , "Classement", color = "maroon",
              icon = icon("stats", lib = "glyphicon"), width = 12)
       
